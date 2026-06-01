@@ -1,0 +1,26 @@
+{
+  "temperature": {
+    "min": -50.0,
+    "max": 60.0
+  },
+  "humidity": {
+    "min": 0.0,
+    "max": 100.0
+  },
+  "pressure": {
+    "min": 850.0,
+    "max": 1100.0
+  },
+  "wind_speed": {
+    "min": 0.0,
+    "max": 150.0
+  },
+  "wind_direction": {
+    "min": 0.0,
+    "max": 360.0
+  },
+  "rain_mm": {
+    "min": 0.0,
+    "max": 50.0
+  }
+}
