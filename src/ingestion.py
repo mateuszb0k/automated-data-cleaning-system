@@ -9,4 +9,6 @@ STATIONS = list(requests.get(API_URL+"/weather/stations", headers={"Authorizatio
 if __name__ == "__main__":
     for station in STATIONS:
         latest_weather_data = requests.get(API_URL+f"/weather/latest?station_id={station}",headers={"Authorization": API_KEY}).json()
-        json.dump(latest_weather_data,open(f"../data/bronze/{station}_{latest_weather_data['timestamp']}.json","w"))
+        timestamp_cleaned = latest_weather_data["timestamp"].split('.')[0]
+        print(timestamp_cleaned)
+        json.dump(latest_weather_data,open(f"../data/bronze/{station}_{timestamp_cleaned}.json","w"))
