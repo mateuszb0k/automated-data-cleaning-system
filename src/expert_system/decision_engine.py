@@ -2,7 +2,15 @@ import pandas as pd
 
 from src.pipeline.storage_manager import createDataFrame
 import json
-
+FEATURES_TO_CHECK=[
+    'temperature',
+    'humidity',
+    'pressure',
+    'wind_speed',
+    'rain_mm',
+    'wind_direction',
+]
+MEAN_MULTIPLE = 2
 def load_rules():
     """
     Loads the rules from 'config/cleaning_rules.json'.
@@ -11,26 +19,39 @@ def load_rules():
     with open(json_path, 'r') as f:
         return json.load(f)
 
-def checkRow(row, rules):
+def checkRules(data:pd.DataFrame):
     """
-    Validates a row against predefined boundaries and returns a dictionary of detected missing or out-of-bounds values.
+    Validates a dataframe against predefined boundaries and returns a dataFrame with an added bool column is_anomaly
     """
-    wrong_values = {}
-    for label, value in row.items():
-        if label in rules:
-            if pd.isna(value):
-                wrong_values[label] = "NaN"
-                continue
+    rules = load_rules()
+    data['is_anomaly'] = False
+    for FEATURE in FEATURES_TO_CHECK:
+        data[f'is_anomaly'] |= (data[f'{FEATURE}'] < rules[f'{FEATURE}']['min']) | (data[f'{FEATURE}'] > rules[f'{FEATURE}']['max'])
+    clean_data = data[~data['is_anomaly']]
+    quarantine_data = data[data['is_anomaly']]
+    return clean_data, quarantine_data
+def zScoreDecisionMaking(data :pd.DataFrame):
+    '''
+    Uses z score to check for anomalies
+    '''
+    data['timestamp'] = pd.to_datetime(data['timestamp'])
+    data.sort_values(by=['station_id', 'timestamp'], ascending=True, inplace=True)
+    rules = load_rules()
+    for FEATURE in FEATURES_TO_CHECK:
+        if FEATURE == 'rain_mm' or FEATURE == 'wind_direction':
+            data[f'{FEATURE}_is_anomaly'] = (data[f'{FEATURE}']<rules[f'{FEATURE}']['min']) | (data[f'{FEATURE}']>rules[f'{FEATURE}']['max'])
+        else:
+            data[f'{FEATURE}_rolling_mean'] = data.groupby('station_id')[f'{FEATURE}'].transform(lambda x: x.rolling(window = 14,min_periods=1).mean())
+            data[f'{FEATURE}_rolling_std'] = data.groupby('station_id')[f'{FEATURE}'].transform(lambda x: x.rolling(window = 14,min_periods=1).std())
+            data[f'{FEATURE}_z_score'] = (data[f'{FEATURE}'] - data[f'{FEATURE}_rolling_mean']) / data[f'{FEATURE}_rolling_std']
+            data[f'{FEATURE}_is_anomaly'] = (data[f'{FEATURE}_z_score'].abs()>MEAN_MULTIPLE) & (data[f'{FEATURE}_rolling_std'].abs()>0)
+    return data
 
-            if value < rules[label]['min'] or value > rules[label]['max']:
-                wrong_values[label] = value
-
-    return None if not wrong_values else wrong_values
 
 if __name__ == "__main__":
-    rules = load_rules()
     df = createDataFrame()
-    for idx, row in df.iterrows():
-        errors = checkRow(row, rules)
-        if errors is not None:
-            print(row["timestamp"], errors)
+    clean_data,quarantine_data = checkRules(df)
+    processed_df = zScoreDecisionMaking(clean_data)
+    for feature in FEATURES_TO_CHECK:
+        feature_anomaly = processed_df[processed_df[f'{feature}_is_anomaly'] == True]
+        print(feature_anomaly[['timestamp', 'station_id', f'{feature}']] if feature == 'rain_mm' or feature == 'wind_direction' else feature_anomaly[['timestamp', 'station_id', f'{feature}', f'{feature}_z_score']])

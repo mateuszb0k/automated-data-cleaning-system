@@ -2,12 +2,14 @@ import requests
 import os
 import dotenv
 import json
-
+'''
+    Creates json files for each weather station data
+'''
 dotenv.load("../../config/.env")
 API_URL = os.getenv("WEATHER_API_URL")
 API_KEY = os.getenv("WEATHER_API_TOKEN")
 STATIONS = list(requests.get(API_URL+"/weather/stations", headers={"Authorization": API_KEY}).json().values())[0]
-LIMIT = 10000
+LIMIT = 50
 
 if __name__ == "__main__":
     for station in STATIONS:
