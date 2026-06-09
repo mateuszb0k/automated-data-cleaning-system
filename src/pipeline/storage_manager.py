@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+import os
 
 def createDataFrame():
     """
@@ -22,3 +23,8 @@ def createDataFrame():
         df_row = pd.read_json(str(json_file), typ="series").to_frame().T
         df = pd.concat([df, df_row], ignore_index=True)
     return df
+
+def exportData(data,datapath,filename):
+    os.makedirs(datapath,exist_ok=True)
+    data.to_json(os.path.join(datapath,filename),orient='records', indent = 4)
+
