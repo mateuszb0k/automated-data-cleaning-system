@@ -1,13 +1,12 @@
-import json
 import pandas as pd
-from src.config.utils import FEATURES_TO_CHECK,MEAN_MULTIPLE, load_rules
+from config.utils import FEATURES_TO_CHECK,MEAN_MULTIPLE, load_rules
 
 
 def zScoreDecisionMaking(data :pd.DataFrame):
     '''
     Uses z score to check for anomalies
     '''
-    data['timestamp'] = pd.to_datetime(data['timestamp'])
+    # data['timestamp'] = pd.to_datetime(data['timestamp'])
     data.sort_values(by=['station_id', 'timestamp'], ascending=True, inplace=True)
     rules = load_rules()
     for FEATURE in FEATURES_TO_CHECK:

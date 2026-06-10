@@ -14,6 +14,6 @@ def load_rules():
     """
     Loads the rules from 'config/cleaning_rules.json'.
     """
-    json_path = '../../config/cleaning_rules.json'
+    json_path = 'config/cleaning_rules.json' # If running from main remove "../../"
     with open(json_path, 'r') as f:
         return json.load(f)

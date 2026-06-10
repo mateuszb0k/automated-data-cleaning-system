@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
-from src.config.utils import FEATURES_TO_CHECK
-
-
+from config.utils import FEATURES_TO_CHECK
 
 def fixAnomalies(data:pd.DataFrame):
     changes = []

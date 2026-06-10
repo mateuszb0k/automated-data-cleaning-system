@@ -17,7 +17,7 @@ def createDataFrame():
             - rain_mm
             - cloud_cover
     """
-    all_json_files = list(Path('../data/bronze').rglob('*.json'))
+    all_json_files = list(Path('src/data/bronze').rglob('*.json')) # If running from main replace "../" with "src"
     df = pd.DataFrame()
     for json_file in all_json_files:
         df_row = pd.read_json(str(json_file), typ="series").to_frame().T
@@ -27,4 +27,3 @@ def createDataFrame():
 def exportData(data,datapath,filename):
     os.makedirs(datapath,exist_ok=True)
     data.to_json(os.path.join(datapath,filename),orient='records', indent = 4)
-
