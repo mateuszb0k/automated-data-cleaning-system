@@ -1,8 +1,5 @@
 # Automated Data Cleaning & Recommendation System
 
-<video src="video/video.mp4" controls="controls" style="max-width: 100%;">
-  Your browser don't suport video tag.
-</video>
 
 ## About the Project
 The project involves fetching data from weather stations and analyzing it for the occurrence of anomalies.
