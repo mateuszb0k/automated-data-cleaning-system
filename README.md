@@ -1,6 +1,9 @@
 # Automated Data Cleaning & Recommendation System
 
 
+https://github.com/user-attachments/assets/441d8dd4-c068-4b2f-89df-31cae72c7715
+
+
 ## About the Project
 The project involves fetching data from weather stations and analyzing it for the occurrence of anomalies.
 Next, the data is quarantined, and after cleaning, it goes to the so-called Silver layer (Silver Data).
